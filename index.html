@@ -1,0 +1,497 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Food RNG 2 — Coming Soon</title>
+
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap');
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    min-height: 100vh;
+    overflow: hidden;
+    font-family: 'Inter', sans-serif;
+    background:
+        radial-gradient(circle at 20% 20%, rgba(255, 174, 0, .15), transparent 30%),
+        radial-gradient(circle at 80% 80%, rgba(255, 70, 70, .12), transparent 30%),
+        #050505;
+    color: white;
+}
+
+/* Background glow */
+
+.glow {
+    position: fixed;
+    width: 500px;
+    height: 500px;
+    border-radius: 50%;
+    filter: blur(130px);
+    opacity: .22;
+    pointer-events: none;
+}
+
+.glow.one {
+    background: #ff9d00;
+    top: -200px;
+    left: -150px;
+}
+
+.glow.two {
+    background: #ff3b3b;
+    bottom: -250px;
+    right: -150px;
+}
+
+/* Floating food */
+
+.food {
+    position: fixed;
+    font-size: 35px;
+    opacity: .13;
+    animation: float 12s linear infinite;
+    pointer-events: none;
+}
+
+@keyframes float {
+    0% {
+        transform: translateY(110vh) rotate(0deg);
+    }
+
+    100% {
+        transform: translateY(-120vh) rotate(360deg);
+    }
+}
+
+.food:nth-child(1) { left: 5%; animation-delay: 0s; }
+.food:nth-child(2) { left: 15%; animation-delay: 3s; }
+.food:nth-child(3) { left: 27%; animation-delay: 6s; }
+.food:nth-child(4) { left: 42%; animation-delay: 1s; }
+.food:nth-child(5) { left: 58%; animation-delay: 5s; }
+.food:nth-child(6) { left: 73%; animation-delay: 2s; }
+.food:nth-child(7) { left: 87%; animation-delay: 7s; }
+
+/* Main */
+
+.container {
+    position: relative;
+    z-index: 5;
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 25px;
+}
+
+.card {
+    width: min(900px, 95vw);
+    padding: 60px 40px;
+    text-align: center;
+
+    background: rgba(255,255,255,.055);
+    border: 1px solid rgba(255,255,255,.13);
+    border-radius: 35px;
+
+    backdrop-filter: blur(25px);
+    -webkit-backdrop-filter: blur(25px);
+
+    box-shadow:
+        0 30px 100px rgba(0,0,0,.6),
+        inset 0 1px rgba(255,255,255,.12);
+
+    animation: appear 1.2s cubic-bezier(.16,1,.3,1);
+}
+
+@keyframes appear {
+    from {
+        opacity: 0;
+        transform: translateY(40px) scale(.95);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+/* Logo */
+
+.logo {
+    display: inline-block;
+    font-size: clamp(35px, 7vw, 75px);
+    font-weight: 900;
+    letter-spacing: -5px;
+
+    background: linear-gradient(
+        110deg,
+        #fff,
+        #ffd36a,
+        #ff8a00,
+        #fff
+    );
+
+    background-size: 250%;
+    -webkit-background-clip: text;
+    color: transparent;
+
+    animation: shine 4s linear infinite;
+}
+
+@keyframes shine {
+    from { background-position: 0%; }
+    to { background-position: 250%; }
+}
+
+.subtitle {
+    margin-top: 8px;
+    color: rgba(255,255,255,.55);
+    font-size: 14px;
+    letter-spacing: 5px;
+    text-transform: uppercase;
+}
+
+.tag {
+    margin: 35px auto 20px;
+    display: inline-block;
+
+    padding: 9px 17px;
+    border-radius: 999px;
+
+    background: rgba(255,157,0,.12);
+    border: 1px solid rgba(255,157,0,.3);
+
+    color: #ffc15c;
+    font-size: 12px;
+    font-weight: 800;
+    letter-spacing: 2px;
+
+    box-shadow: 0 0 30px rgba(255,157,0,.1);
+}
+
+/* Countdown */
+
+.countdown {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    margin: 30px 0;
+    flex-wrap: wrap;
+}
+
+.unit {
+    min-width: 150px;
+    padding: 25px 20px;
+
+    border-radius: 22px;
+
+    background: rgba(0,0,0,.35);
+    border: 1px solid rgba(255,255,255,.09);
+
+    box-shadow:
+        inset 0 0 30px rgba(255,255,255,.02),
+        0 10px 30px rgba(0,0,0,.3);
+
+    transition: transform .25s ease;
+}
+
+.unit:hover {
+    transform: translateY(-6px);
+}
+
+.number {
+    font-size: clamp(45px, 7vw, 75px);
+    font-weight: 900;
+    letter-spacing: -4px;
+
+    text-shadow:
+        0 0 25px rgba(255,157,0,.35);
+}
+
+.label {
+    margin-top: 5px;
+    color: rgba(255,255,255,.4);
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 3px;
+}
+
+/* Launch text */
+
+.launch {
+    margin-top: 20px;
+    color: rgba(255,255,255,.65);
+    font-size: 15px;
+}
+
+.highlight {
+    color: #ffae27;
+    font-weight: 800;
+}
+
+/* Progress */
+
+.progress-container {
+    max-width: 650px;
+    margin: 35px auto 0;
+}
+
+.progress-bar {
+    height: 5px;
+    border-radius: 999px;
+    overflow: hidden;
+    background: rgba(255,255,255,.08);
+}
+
+.progress {
+    height: 100%;
+    width: 100%;
+    border-radius: inherit;
+
+    background: linear-gradient(
+        90deg,
+        #ff6a00,
+        #ffc400
+    );
+
+    box-shadow:
+        0 0 20px rgba(255,157,0,.7);
+
+    transition: width 1s linear;
+}
+
+.progress-text {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 10px;
+
+    font-size: 10px;
+    color: rgba(255,255,255,.3);
+    font-weight: 700;
+}
+
+/* Bottom */
+
+.bottom {
+    margin-top: 35px;
+    color: rgba(255,255,255,.25);
+    font-size: 11px;
+    letter-spacing: 2px;
+}
+
+.bottom span {
+    color: rgba(255,174,0,.7);
+}
+
+/* Mobile */
+
+@media(max-width: 600px) {
+
+    .card {
+        padding: 40px 18px;
+    }
+
+    .unit {
+        min-width: 105px;
+        padding: 20px 10px;
+    }
+
+    .number {
+        font-size: 45px;
+    }
+
+    .logo {
+        letter-spacing: -3px;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<div class="glow one"></div>
+<div class="glow two"></div>
+
+<!-- Floating food -->
+<div class="food">🍔</div>
+<div class="food">🍕</div>
+<div class="food">🍣</div>
+<div class="food">🍜</div>
+<div class="food">🌮</div>
+<div class="food">🍩</div>
+<div class="food">🍓</div>
+
+<div class="container">
+
+    <div class="card">
+
+        <div class="tag">
+            🎲 THE NEXT ERA
+        </div>
+
+        <h1 class="logo">
+            FOOD RNG 2
+        </h1>
+
+        <div class="subtitle">
+            A Tuff Game
+        </div>
+
+        <div class="countdown">
+
+            <div class="unit">
+                <div class="number" id="days">02</div>
+                <div class="label">DAYS</div>
+            </div>
+
+            <div class="unit">
+                <div class="number" id="hours">00</div>
+                <div class="label">HOURS</div>
+            </div>
+
+            <div class="unit">
+                <div class="number" id="minutes">00</div>
+                <div class="label">MINUTES</div>
+            </div>
+
+            <div class="unit">
+                <div class="number" id="seconds">00</div>
+                <div class="label">SECONDS</div>
+            </div>
+
+        </div>
+
+        <div class="launch">
+            Something <span class="highlight">FOODISH</span> is coming...
+        </div>
+
+        <div class="progress-container">
+
+            <div class="progress-bar">
+                <div class="progress" id="progress"></div>
+            </div>
+
+            <div class="progress-text">
+                <span>FOOD RNG 1</span>
+                <span>FOOD RNG 2</span>
+            </div>
+
+        </div>
+
+        <div class="bottom">
+            CREATED BY <span>NATHAN × LUCAS</span>
+        </div>
+
+    </div>
+
+</div>
+
+<script>
+
+/*
+    ======================================
+       FOOD RNG 2 COUNTDOWN
+    ======================================
+
+    The first time this page is opened,
+    it creates a 48-hour countdown.
+
+    Refreshing the page DOES NOT reset it.
+*/
+
+const COUNTDOWN_DURATION = 48 * 60 * 60 * 1000;
+
+let targetTime = localStorage.getItem("foodRng2Launch");
+
+if (!targetTime) {
+
+    targetTime = Date.now() + COUNTDOWN_DURATION;
+
+    localStorage.setItem(
+        "foodRng2Launch",
+        targetTime
+    );
+}
+
+targetTime = Number(targetTime);
+
+function pad(number) {
+    return String(number).padStart(2, "0");
+}
+
+function updateCountdown() {
+
+    const now = Date.now();
+
+    let remaining = targetTime - now;
+
+    if (remaining <= 0) {
+
+        document.getElementById("days").textContent = "00";
+        document.getElementById("hours").textContent = "00";
+        document.getElementById("minutes").textContent = "00";
+        document.getElementById("seconds").textContent = "00";
+
+        document.querySelector(".tag").textContent =
+            "🔥 IT'S HERE";
+
+        document.querySelector(".launch").innerHTML =
+            '<span class="highlight">FOOD RNG 2 IS LIVE.</span>';
+
+        document.getElementById("progress").style.width = "0%";
+
+        return;
+    }
+
+    const days =
+        Math.floor(remaining / (1000 * 60 * 60 * 24));
+
+    const hours =
+        Math.floor(
+            (remaining / (1000 * 60 * 60)) % 24
+        );
+
+    const minutes =
+        Math.floor(
+            (remaining / (1000 * 60)) % 60
+        );
+
+    const seconds =
+        Math.floor(
+            (remaining / 1000) % 60
+        );
+
+    document.getElementById("days").textContent =
+        pad(days);
+
+    document.getElementById("hours").textContent =
+        pad(hours);
+
+    document.getElementById("minutes").textContent =
+        pad(minutes);
+
+    document.getElementById("seconds").textContent =
+        pad(seconds);
+
+    // Progress bar
+
+    const progress =
+        (remaining / COUNTDOWN_DURATION) * 100;
+
+    document.getElementById("progress").style.width =
+        progress + "%";
+}
+
+updateCountdown();
+
+setInterval(updateCountdown, 1000);
+
+</script>
+
+</body>
+</html>
