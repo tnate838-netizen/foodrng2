@@ -1,1 +1,1463 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FOOD RNG 2 — Coming Soon</title>
 
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+:root {
+    --orange: #ff8a00;
+    --gold: #ffc247;
+    --white: #f5f5f5;
+    --muted: rgba(255,255,255,.42);
+}
+
+html, body {
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    background: #020202;
+}
+
+body {
+    font-family: Inter, Arial, sans-serif;
+    color: white;
+}
+
+/* =========================
+   CINEMATIC BACKGROUND
+========================= */
+
+.background {
+    position: fixed;
+    inset: 0;
+    overflow: hidden;
+    background:
+        radial-gradient(
+            circle at 50% 50%,
+            rgba(255, 125, 0, .08),
+            transparent 30%
+        ),
+        linear-gradient(
+            180deg,
+            #010101 0%,
+            #050505 50%,
+            #010101 100%
+        );
+}
+
+.background::before {
+    content: "";
+    position: absolute;
+    inset: -50%;
+    background:
+        radial-gradient(
+            ellipse,
+            rgba(255, 130, 0, .11),
+            transparent 45%
+        );
+    animation: breathe 7s ease-in-out infinite;
+}
+
+@keyframes breathe {
+    0%,100% {
+        transform: scale(.85);
+        opacity: .4;
+    }
+
+    50% {
+        transform: scale(1.15);
+        opacity: 1;
+    }
+}
+
+/* Light rays */
+
+.rays {
+    position: absolute;
+    inset: 0;
+    background:
+        conic-gradient(
+            from 0deg at 50% 50%,
+            transparent,
+            rgba(255,255,255,.025),
+            transparent 15%,
+            rgba(255,140,0,.025),
+            transparent 30%,
+            rgba(255,255,255,.02),
+            transparent 50%
+        );
+    animation: rotateRays 25s linear infinite;
+}
+
+@keyframes rotateRays {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* Vignette */
+
+.vignette {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+
+    background:
+        radial-gradient(
+            ellipse at center,
+            transparent 20%,
+            rgba(0,0,0,.2) 55%,
+            rgba(0,0,0,.9) 100%
+        );
+}
+
+/* =========================
+   TOP BAR
+========================= */
+
+.top {
+    position: absolute;
+    top: 35px;
+    left: 45px;
+    right: 45px;
+
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    z-index: 20;
+}
+
+.logo-small {
+    font-size: 12px;
+    font-weight: 900;
+    letter-spacing: 4px;
+    color: rgba(255,255,255,.7);
+}
+
+.status {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: 2px;
+    color: rgba(255,255,255,.45);
+}
+
+.status-dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: #ff8a00;
+
+    box-shadow:
+        0 0 12px #ff8a00;
+
+    animation: statusPulse 1.5s infinite;
+}
+
+@keyframes statusPulse {
+    50% {
+        opacity: .3;
+        transform: scale(.7);
+    }
+}
+
+/* =========================
+   RARITY CARDS
+========================= */
+
+.rarity-field {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+}
+
+.rarity {
+    position: absolute;
+
+    padding: 10px 17px;
+
+    border: 1px solid rgba(255,255,255,.08);
+    border-radius: 8px;
+
+    background: rgba(255,255,255,.025);
+    backdrop-filter: blur(8px);
+
+    font-size: 9px;
+    font-weight: 900;
+    letter-spacing: 3px;
+
+    opacity: 0;
+
+    animation:
+        rarityFloat 14s linear infinite,
+        rarityAppear 1s ease forwards;
+}
+
+.rarity.common {
+    color: #aaa;
+}
+
+.rarity.rare {
+    color: #65a9ff;
+}
+
+.rarity.epic {
+    color: #bb73ff;
+}
+
+.rarity.legendary {
+    color: #ff9b2f;
+}
+
+.rarity.mythic {
+    color: #ff5252;
+}
+
+.rarity.godly {
+    color: #fff;
+    border-color: rgba(255,210,90,.25);
+    box-shadow: 0 0 30px rgba(255,170,0,.08);
+}
+
+@keyframes rarityAppear {
+    to {
+        opacity: .18;
+    }
+}
+
+@keyframes rarityFloat {
+    from {
+        transform: translateY(110vh) rotate(-4deg);
+    }
+
+    to {
+        transform: translateY(-120vh) rotate(4deg);
+    }
+}
+
+.r1 { left: 7%; animation-delay: 0s; }
+.r2 { left: 22%; animation-delay: 4s; }
+.r3 { left: 38%; animation-delay: 8s; }
+.r4 { left: 57%; animation-delay: 2s; }
+.r5 { left: 73%; animation-delay: 6s; }
+.r6 { left: 88%; animation-delay: 10s; }
+
+/* =========================
+   MAIN
+========================= */
+
+.main {
+    position: relative;
+    z-index: 10;
+
+    width: 100%;
+    height: 100%;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    text-align: center;
+}
+
+.content {
+    width: min(1100px, 94vw);
+
+    animation:
+        entrance 1.8s cubic-bezier(.16,1,.3,1);
+}
+
+@keyframes entrance {
+    from {
+        opacity: 0;
+        transform: scale(1.05);
+        filter: blur(15px);
+    }
+
+    to {
+        opacity: 1;
+        transform: scale(1);
+        filter: blur(0);
+    }
+}
+
+/* =========================
+   EYEBROW
+========================= */
+
+.eyebrow {
+    margin-bottom: 20px;
+
+    font-size: 10px;
+    font-weight: 900;
+    letter-spacing: 7px;
+
+    color: rgba(255,255,255,.42);
+
+    text-transform: uppercase;
+}
+
+.eyebrow span {
+    color: var(--orange);
+}
+
+/* =========================
+   TITLE
+========================= */
+
+.title {
+    font-size: clamp(55px, 10vw, 135px);
+    line-height: .8;
+
+    font-weight: 900;
+    letter-spacing: -8px;
+
+    color: white;
+
+    text-shadow:
+        0 0 50px rgba(255,255,255,.06),
+        0 0 100px rgba(255,130,0,.08);
+
+    user-select: none;
+}
+
+.title .two {
+    color: transparent;
+
+    background:
+        linear-gradient(
+            180deg,
+            #fff,
+            #ffb12b 65%,
+            #ff6800
+        );
+
+    -webkit-background-clip: text;
+    background-clip: text;
+}
+
+.subtitle {
+    margin-top: 22px;
+
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 8px;
+
+    color: rgba(255,255,255,.3);
+
+    text-transform: uppercase;
+}
+
+/* =========================
+   COUNTDOWN
+========================= */
+
+.countdown {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    gap: clamp(10px, 2vw, 25px);
+
+    margin-top: 65px;
+}
+
+.time-block {
+    position: relative;
+
+    min-width: clamp(70px, 13vw, 170px);
+}
+
+.number {
+    font-size: clamp(55px, 9vw, 115px);
+
+    font-weight: 800;
+    letter-spacing: -6px;
+
+    color: #f8f8f8;
+
+    text-shadow:
+        0 0 35px rgba(255,255,255,.12);
+
+    transition:
+        transform .15s ease,
+        color .15s ease;
+}
+
+.number.bump {
+    transform: scale(1.08);
+    color: #fff3d0;
+
+    text-shadow:
+        0 0 40px rgba(255,160,40,.45);
+}
+
+.label {
+    margin-top: 5px;
+
+    font-size: 8px;
+    font-weight: 900;
+    letter-spacing: 4px;
+
+    color: rgba(255,255,255,.25);
+}
+
+.colon {
+    margin-top: -25px;
+
+    font-size: clamp(35px, 5vw, 70px);
+    font-weight: 200;
+
+    color: rgba(255,255,255,.2);
+
+    animation: colonPulse 1s infinite;
+}
+
+@keyframes colonPulse {
+    50% {
+        opacity: .3;
+    }
+}
+
+/* =========================
+   MESSAGE
+========================= */
+
+.message {
+    margin-top: 55px;
+
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 2px;
+
+    color: rgba(255,255,255,.32);
+}
+
+.message strong {
+    color: rgba(255,177,43,.8);
+}
+
+/* =========================
+   PROGRESS
+========================= */
+
+.progress-wrapper {
+    width: min(600px, 75vw);
+
+    margin: 28px auto 0;
+}
+
+.progress-track {
+    width: 100%;
+    height: 2px;
+
+    background: rgba(255,255,255,.08);
+}
+
+.progress {
+    width: 100%;
+    height: 100%;
+
+    background:
+        linear-gradient(
+            90deg,
+            #ff5a00,
+            #ffc247
+        );
+
+    box-shadow:
+        0 0 15px rgba(255,140,0,.5);
+
+    transition: width 1s linear;
+}
+
+.progress-info {
+    display: flex;
+    justify-content: space-between;
+
+    margin-top: 8px;
+
+    font-size: 7px;
+    font-weight: 800;
+    letter-spacing: 2px;
+
+    color: rgba(255,255,255,.18);
+}
+
+/* =========================
+   FOOTER
+========================= */
+
+.footer {
+    position: absolute;
+
+    bottom: 28px;
+    left: 0;
+    right: 0;
+
+    text-align: center;
+
+    z-index: 20;
+
+    font-size: 8px;
+    font-weight: 700;
+    letter-spacing: 3px;
+
+    color: rgba(255,255,255,.18);
+}
+
+.footer span {
+    color: rgba(255,166,35,.55);
+}
+
+/* =========================
+   LAUNCH SCREEN
+========================= */
+
+.launch-screen {
+    position: fixed;
+    inset: 0;
+
+    z-index: 100;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+
+    background: #000;
+
+    opacity: 0;
+    visibility: hidden;
+
+    transition:
+        opacity 1s ease,
+        visibility 1s ease;
+}
+
+.launch-screen.active {
+    opacity: 1;
+    visibility: visible;
+}
+
+.launch-screen::before {
+    content: "";
+
+    position: absolute;
+    width: 500px;
+    height: 500px;
+
+    border-radius: 50%;
+
+    background: #ff7a00;
+
+    filter: blur(180px);
+
+    opacity: 0;
+
+    animation: launchGlow 3s ease forwards;
+}
+
+@keyframes launchGlow {
+    50% {
+        opacity: .15;
+        transform: scale(1.5);
+    }
+
+    100% {
+        opacity: .08;
+        transform: scale(2);
+    }
+}
+
+.live-small {
+    position: relative;
+
+    font-size: 10px;
+    font-weight: 900;
+    letter-spacing: 8px;
+
+    color: #ff9a1f;
+
+    margin-bottom: 25px;
+}
+
+.live-title {
+    position: relative;
+
+    font-size: clamp(55px, 12vw, 170px);
+    line-height: .8;
+
+    font-weight: 900;
+    letter-spacing: -8px;
+
+    background:
+        linear-gradient(
+            180deg,
+            white,
+            #ffad26,
+            #ff6100
+        );
+
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+
+    animation: launchTitle 2s cubic-bezier(.16,1,.3,1);
+}
+
+@keyframes launchTitle {
+    from {
+        transform: scale(1.5);
+        opacity: 0;
+        filter: blur(20px);
+    }
+
+    to {
+        transform: scale(1);
+        opacity: 1;
+        filter: blur(0);
+    }
+}
+
+.live-text {
+    position: relative;
+
+    margin-top: 30px;
+
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 6px;
+
+    color: rgba(255,255,255,.4);
+}
+
+.enter {
+    position: relative;
+
+    margin-top: 45px;
+
+    padding: 16px 32px;
+
+    border: 1px solid rgba(255,180,50,.4);
+    border-radius: 999px;
+
+    background: rgba(255,140,0,.08);
+
+    color: #ffc05c;
+
+    font-size: 10px;
+    font-weight: 900;
+    letter-spacing: 3px;
+
+    cursor: pointer;
+
+    transition: .3s ease;
+}
+
+.enter:hover {
+    background: rgba(255,140,0,.18);
+    box-shadow: 0 0 40px rgba(255,140,0,.15);
+    transform: translateY(-3px);
+}
+
+/* =========================
+   PARTICLES
+========================= */
+
+.particle {
+    position: fixed;
+
+    width: 2px;
+    height: 2px;
+
+    border-radius: 50%;
+
+    background: white;
+
+    opacity: .25;
+
+    pointer-events: none;
+
+    animation: particleFloat linear infinite;
+}
+
+@keyframes particleFloat {
+    from {
+        transform: translateY(100vh);
+    }
+
+    to {
+        transform: translateY(-10vh);
+    }
+}
+
+/* =========================
+   SCREEN SHAKE
+========================= */
+
+.shake {
+    animation: shake .22s ease;
+}
+
+@keyframes shake {
+    0%,100% {
+        transform: translate(0);
+    }
+
+    25% {
+        transform: translate(-5px, 3px);
+    }
+
+    50% {
+        transform: translate(4px, -3px);
+    }
+
+    75% {
+        transform: translate(-3px, -2px);
+    }
+}
+
+/* =========================
+   FLASH
+========================= */
+
+.flash {
+    position: fixed;
+    inset: 0;
+
+    z-index: 90;
+
+    background: white;
+
+    opacity: 0;
+    pointer-events: none;
+}
+
+.flash.active {
+    animation: flash .35s ease;
+}
+
+@keyframes flash {
+    0% { opacity: 0; }
+    15% { opacity: .8; }
+    100% { opacity: 0; }
+}
+
+/* =========================
+   MOBILE
+========================= */
+
+@media(max-width: 600px) {
+
+    .top {
+        top: 22px;
+        left: 20px;
+        right: 20px;
+    }
+
+    .title {
+        letter-spacing: -5px;
+    }
+
+    .subtitle {
+        letter-spacing: 5px;
+    }
+
+    .countdown {
+        margin-top: 45px;
+        gap: 4px;
+    }
+
+    .number {
+        letter-spacing: -3px;
+    }
+
+    .colon {
+        font-size: 30px;
+    }
+
+    .message {
+        margin-top: 40px;
+        padding: 0 20px;
+    }
+
+    .rarity {
+        transform: scale(.8);
+    }
+}
+</style>
+</head>
+
+<body>
+
+<!-- =========================
+     BACKGROUND
+========================= -->
+
+<div class="background">
+    <div class="rays"></div>
+    <div class="vignette"></div>
+</div>
+
+<div class="flash" id="flash"></div>
+
+<!-- =========================
+     TOP
+========================= -->
+
+<div class="top">
+
+    <div class="logo-small">
+        FOOD RNG 2
+    </div>
+
+    <div class="status">
+        <div class="status-dot"></div>
+        SEPTEMBER 24 • 9:20 PM MDT
+    </div>
+
+</div>
+
+<!-- =========================
+     FLOATING RARITIES
+========================= -->
+
+<div class="rarity-field">
+
+    <div class="rarity common r1">
+        COMMON
+    </div>
+
+    <div class="rarity rare r2">
+        RARE
+    </div>
+
+    <div class="rarity epic r3">
+        EPIC
+    </div>
+
+    <div class="rarity legendary r4">
+        LEGENDARY
+    </div>
+
+    <div class="rarity mythic r5">
+        MYTHIC
+    </div>
+
+    <div class="rarity godly r6">
+        GODLY
+    </div>
+
+</div>
+
+<!-- =========================
+     PARTICLES
+========================= -->
+
+<div id="particles"></div>
+
+<!-- =========================
+     MAIN
+========================= -->
+
+<main class="main" id="main">
+
+    <div class="content">
+
+        <div class="eyebrow">
+            <span>●</span> THE NEXT ERA OF FOOD RNG
+        </div>
+
+        <h1 class="title">
+            FOOD RNG <span class="two">2</span>
+        </h1>
+
+        <div class="subtitle">
+            A TUFFF GAME
+        </div>
+
+        <!-- COUNTDOWN -->
+
+        <div class="countdown">
+
+            <div class="time-block">
+                <div class="number" id="days">02</div>
+                <div class="label">DAYS</div>
+            </div>
+
+            <div class="colon">:</div>
+
+            <div class="time-block">
+                <div class="number" id="hours">00</div>
+                <div class="label">HOURS</div>
+            </div>
+
+            <div class="colon">:</div>
+
+            <div class="time-block">
+                <div class="number" id="minutes">00</div>
+                <div class="label">MINUTES</div>
+            </div>
+
+            <div class="colon">:</div>
+
+            <div class="time-block">
+                <div class="number" id="seconds">00</div>
+                <div class="label">SECONDS</div>
+            </div>
+
+        </div>
+
+        <div class="message">
+            SOMETHING <strong>FOODISH</strong> IS COMING.
+        </div>
+
+        <!-- PROGRESS -->
+
+        <div class="progress-wrapper">
+
+            <div class="progress-track">
+                <div class="progress" id="progress"></div>
+            </div>
+
+            <div class="progress-info">
+                <span>FOOD RNG</span>
+                <span>FOOD RNG 2</span>
+            </div>
+
+        </div>
+
+    </div>
+
+</main>
+
+<!-- =========================
+     FOOTER
+========================= -->
+
+<div class="footer">
+    CREATED BY <span>NATHAN × LUCAS</span>
+</div>
+
+<!-- =========================
+     LAUNCH SCREEN
+========================= -->
+
+<div class="launch-screen" id="launchScreen">
+
+    <div class="live-small">
+        THE WAIT IS OVER
+    </div>
+
+    <div class="live-title">
+        FOOD RNG 2
+    </div>
+
+    <div class="live-text">
+        IS NOW LIVE
+    </div>
+
+    <button class="enter" onclick="enterGame()">
+        ENTER FOOD RNG 2 →
+    </button>
+
+</div>
+
+
+<script>
+
+/* =====================================================
+   FOOD RNG 2 — CINEMATIC COUNTDOWN ENGINE
+===================================================== */
+
+
+/* =====================================================
+   COUNTDOWN SETTINGS
+===================================================== */
+
+/*
+   FIXED FOOD RNG 2 LAUNCH DATE
+   September 24, 2026 — 9:20 PM MDT
+*/
+
+const launchTime =
+    new Date("2026-09-24T21:20:00-06:00").getTime();
+
+/*
+   Countdown starts September 22, 2026 at 9:00 PM MDT.
+   This keeps the progress bar synced to the full 48-hour countdown.
+*/
+const countdownStart =
+    new Date("2026-09-22T21:00:00-06:00").getTime();
+
+const TOTAL_TIME =
+    launchTime - countdownStart;
+
+
+/* =====================================================
+   ELEMENTS
+===================================================== */
+
+const daysElement =
+    document.getElementById("days");
+
+const hoursElement =
+    document.getElementById("hours");
+
+const minutesElement =
+    document.getElementById("minutes");
+
+const secondsElement =
+    document.getElementById("seconds");
+
+const progressElement =
+    document.getElementById("progress");
+
+const main =
+    document.getElementById("main");
+
+const flash =
+    document.getElementById("flash");
+
+const launchScreen =
+    document.getElementById("launchScreen");
+
+
+/* =====================================================
+   AUDIO ENGINE
+
+   Everything is generated in the browser.
+   No external audio files needed.
+===================================================== */
+
+let audioContext = null;
+
+function startAudio() {
+
+    if (!audioContext) {
+
+        audioContext =
+            new (
+                window.AudioContext ||
+                window.webkitAudioContext
+            )();
+    }
+
+    if (audioContext.state === "suspended") {
+        audioContext.resume();
+    }
+}
+
+
+/* Deep cinematic boom */
+
+function boom(strength = 1) {
+
+    if (!audioContext) return;
+
+    const now =
+        audioContext.currentTime;
+
+    const oscillator =
+        audioContext.createOscillator();
+
+    const gain =
+        audioContext.createGain();
+
+    const filter =
+        audioContext.createBiquadFilter();
+
+    oscillator.type = "sine";
+
+    oscillator.frequency.setValueAtTime(
+        75,
+        now
+    );
+
+    oscillator.frequency.exponentialRampToValueAtTime(
+        30,
+        now + .9
+    );
+
+    gain.gain.setValueAtTime(
+        .0001,
+        now
+    );
+
+    gain.gain.exponentialRampToValueAtTime(
+        .55 * strength,
+        now + .015
+    );
+
+    gain.gain.exponentialRampToValueAtTime(
+        .0001,
+        now + 1.1
+    );
+
+    filter.type = "lowpass";
+    filter.frequency.value = 180;
+
+    oscillator
+        .connect(filter)
+        .connect(gain)
+        .connect(audioContext.destination);
+
+    oscillator.start(now);
+    oscillator.stop(now + 1.2);
+}
+
+
+/* Tick */
+
+function tick(strength = 1) {
+
+    if (!audioContext) return;
+
+    const now =
+        audioContext.currentTime;
+
+    const oscillator =
+        audioContext.createOscillator();
+
+    const gain =
+        audioContext.createGain();
+
+    oscillator.type = "square";
+
+    oscillator.frequency.value =
+        900;
+
+    gain.gain.setValueAtTime(
+        .0001,
+        now
+    );
+
+    gain.gain.exponentialRampToValueAtTime(
+        .07 * strength,
+        now + .005
+    );
+
+    gain.gain.exponentialRampToValueAtTime(
+        .0001,
+        now + .08
+    );
+
+    oscillator
+        .connect(gain)
+        .connect(audioContext.destination);
+
+    oscillator.start(now);
+    oscillator.stop(now + .1);
+}
+
+
+/* Final impact */
+
+function finalImpact() {
+
+    boom(3);
+
+    setTimeout(() => boom(2), 150);
+    setTimeout(() => boom(1.5), 350);
+
+    flash.classList.remove("active");
+
+    void flash.offsetWidth;
+
+    flash.classList.add("active");
+
+    main.classList.add("shake");
+
+    setTimeout(() => {
+        main.classList.remove("shake");
+    }, 300);
+}
+
+
+/* =====================================================
+   FORMAT
+===================================================== */
+
+function pad(number) {
+    return String(number).padStart(2, "0");
+}
+
+
+/* =====================================================
+   NUMBER ANIMATION
+===================================================== */
+
+function bump(element) {
+
+    element.classList.remove("bump");
+
+    void element.offsetWidth;
+
+    element.classList.add("bump");
+}
+
+
+/* =====================================================
+   COUNTDOWN
+===================================================== */
+
+let previousSecond = null;
+
+function updateCountdown() {
+
+    const now = Date.now();
+
+    let remaining =
+        launchTime - now;
+
+
+    /* ===============================
+       LAUNCH
+    =============================== */
+
+    if (remaining <= 0) {
+
+        daysElement.textContent = "00";
+        hoursElement.textContent = "00";
+        minutesElement.textContent = "00";
+        secondsElement.textContent = "00";
+
+        progressElement.style.width = "0%";
+
+        finalImpact();
+
+        setTimeout(() => {
+
+            launchScreen.classList.add("active");
+
+        }, 800);
+
+        clearInterval(timer);
+
+        return;
+    }
+
+
+    /* ===============================
+       TIME
+    =============================== */
+
+    const days =
+        Math.floor(
+            remaining /
+            (1000 * 60 * 60 * 24)
+        );
+
+    const hours =
+        Math.floor(
+            (remaining /
+            (1000 * 60 * 60)) % 24
+        );
+
+    const minutes =
+        Math.floor(
+            (remaining /
+            (1000 * 60)) % 60
+        );
+
+    const seconds =
+        Math.floor(
+            (remaining / 1000) % 60
+        );
+
+
+    /* ===============================
+       DISPLAY
+    =============================== */
+
+    daysElement.textContent =
+        pad(days);
+
+    hoursElement.textContent =
+        pad(hours);
+
+    minutesElement.textContent =
+        pad(minutes);
+
+    secondsElement.textContent =
+        pad(seconds);
+
+
+    /* ===============================
+       PROGRESS
+    =============================== */
+
+    const percentage =
+        (remaining / TOTAL_TIME) * 100;
+
+    progressElement.style.width =
+        percentage + "%";
+
+
+    /* ===============================
+       SOUND
+    =============================== */
+
+    if (previousSecond !== seconds) {
+
+        /*
+           Don't blast audio constantly
+           during the 2-day countdown.
+
+           Audio becomes active after
+           the user clicks the page.
+        */
+
+        if (audioContext) {
+
+            if (remaining <= 10000) {
+
+                tick(1.5);
+
+                bump(secondsElement);
+
+            } else if (
+                remaining <= 60000
+            ) {
+
+                tick(.8);
+
+                bump(secondsElement);
+
+            }
+        }
+
+        previousSecond = seconds;
+    }
+}
+
+
+/* =====================================================
+   START
+===================================================== */
+
+updateCountdown();
+
+const timer =
+    setInterval(
+        updateCountdown,
+        250
+    );
+
+
+/* =====================================================
+   CLICK ANYWHERE TO ENABLE AUDIO
+===================================================== */
+
+document.addEventListener(
+    "click",
+    () => {
+
+        startAudio();
+
+    },
+    { once: true }
+);
+
+
+/* =====================================================
+   PARTICLES
+===================================================== */
+
+const particleContainer =
+    document.getElementById("particles");
+
+for (let i = 0; i < 70; i++) {
+
+    const particle =
+        document.createElement("div");
+
+    particle.className =
+        "particle";
+
+    particle.style.left =
+        Math.random() * 100 + "%";
+
+    particle.style.animationDuration =
+        (8 + Math.random() * 18) + "s";
+
+    particle.style.animationDelay =
+        (-Math.random() * 20) + "s";
+
+    particle.style.opacity =
+        (.05 + Math.random() * .3);
+
+    particleContainer.appendChild(
+        particle
+    );
+}
+
+
+/* =====================================================
+   ENTER GAME BUTTON
+===================================================== */
+
+function enterGame() {
+
+    /*
+       CHANGE THIS URL TO YOUR ACTUAL GAME.
+    */
+
+    window.location.href =
+        "https://foodrng2.netlify.app/play";
+}
+
+
+/* =====================================================
+   SPECIAL FINAL COUNTDOWN EFFECTS
+===================================================== */
+
+let finalSequencePlayed = false;
+
+function checkFinalSequence() {
+
+    const remaining =
+        launchTime - Date.now();
+
+    if (
+        remaining <= 10000 &&
+        !finalSequencePlayed
+    ) {
+
+        finalSequencePlayed = true;
+
+        document.body.style.transition =
+            "background 1s ease";
+
+        document.body.style.background =
+            "#090705";
+
+        boom(1);
+
+    }
+}
+
+setInterval(
+    checkFinalSequence,
+    100
+);
+
+</script>
+
+</body>
+</html>
